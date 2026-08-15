@@ -1,8 +1,14 @@
-1 - Descrição Do Projeto
-1.1 - Os alunos do Colégio Técnico de Bom Jesus têm dificuldade em acessar os horários dos professores para tirar dúvidas ou "subir" aula. Há dificuldade também em saber se 
-o professor está presente na escola ou não.
-
-1.2 - A solução encontrada foi um possível site ou aba no próprio sistema escolar(SIGAA) em que os professores das diversas matérias, tanto do Ensino Médio quanto do Técnico,
-disponibilizem seus horários para fácil acesso dos alunos, assim como o professor deve "bater o ponto" para os alunos saberem se o professor está em sua sala na Instituição.
-
 2 - Requisitos Funcionais e Não Funcionais
+
+2.1 Requisitos Funcionais -  
+° O sistema deve exibir os horários de atendimento e aulas de cada professor
+° O professor deve atualizar no sistema se está presente ou não na escola
+° O professor deve poder editar os horários de atendimento ao aluno
+° O sistema deve exibir o status em tempo real(ex: Presente na sala, Em Aula, Ausente)
+
+2.2 Requisitos Não Funcionais -
+° O sistema deve ser adaptável para funcionar em dispositivos móveis e computadores
+° Os horários e o status do professor deve ser simples e fácil de ser visto, em 2 ou 3 cliques
+° O sistema deve estar disponível durante todo o período de aulas
+° Apenas o professor ou coordenador deve poder editar os horários
+° Todos os aluno matriculados devem poder ver os horários e status sem necessidade de aprovação
