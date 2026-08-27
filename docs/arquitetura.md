@@ -209,3 +209,6 @@ A solução poderá ser desenvolvida como um site próprio ou futuramente integr
 A modelagem apresentada representa a estrutura inicial do sistema proposto. Ela demonstra os principais usuários, funcionalidades, informações e fluxos necessários para solucionar o problema identificado na primeira etapa.
 
 A modelagem poderá ser aprimorada durante a etapa de desenvolvimento, conforme novas necessidades forem identificadas.
+
+
+https://trello.com/b/E3lhXEAU/sistema-de-controle-de-presenca
