@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGAA + | Frequência e Horários Interativos</title>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --border: #e2e8f0;
+      --purple-header: #8b5cf6;
+      --orange-header: #f97316;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* LOGIN */
+    .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+    .auth-card { background: var(--card-bg); width: 100%; max-width: 440px; padding: 40px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+    .auth-header { text-align: center; margin-bottom: 25px; }
+    .auth-header h1 { color: var(--primary); font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; }
+    .type-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 8px; margin-bottom: 20px; }
+    .type-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 6px; font-weight: 600; color: var(--text-muted); cursor: pointer; }
+    .type-btn.active { background: var(--card-bg); color: var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; outline: none; }
+    .btn-primary { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    /* APP */
+    .app-container { display: none; flex-direction: column; min-height: 100vh; }
+    navbar { background: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .user-badge { background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; }
+    .btn-logout { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+
+    .tabs-nav { background: white; border-bottom: 1px solid var(--border); display: flex; padding: 0 30px; gap: 10px; }
+    .tab-btn { padding: 15px 20px; border: none; background: transparent; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    main { flex: 1; padding: 30px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card { background: white; border-radius: 12px; padding: 24px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; color: var(--primary); }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px; text-align: center; border: 1px solid var(--border); font-size: 0.9rem; }
+    
+    .grid-horario th { color: white; font-weight: 700; }
+    .grid-manha th { background-color: var(--purple-header); }
+    .grid-manha td { background-color: #f3e8ff; }
+    .grid-tarde th { background-color: var(--orange-header); }
+    .grid-tarde td { background-color: #ffedd5; }
+    .horario-col { background-color: #475569 !important; color: white; font-weight: 700; }
+
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; }
+    .status-presente { background: #dcfce7; color: var(--success); }
+    .status-aula { background: #fef3c7; color: var(--warning); }
+    .status-ausente { background: #fee2e2; color: var(--danger); }
+
+    /* FILTRO DE PESQUISA */
+    .search-bar { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE LOGIN -->
+  <div id="authScreen" class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>SIGAA +</h1>
+        <p>Acesse com suas credenciais acadêmicas</p>
+      </div>
+
+      <div class="type-toggle">
+        <button type="button" class="type-btn active" id="btnRoleAluno" onclick="setRole('aluno')">Aluno</button>
+        <button type="button" class="type-btn" id="btnRoleProfessor" onclick="setRole('professor')">Professor</button>
+      </div>
+
+      <form onsubmit="handleAuth(event)">
+        <div class="form-group">
+          <label>Nome Completo</label>
+          <input type="text" id="inputNome" placeholder="Ex: Clécio Sousa" required>
+        </div>
+        <div class="form-group">
+          <label id="labelIdentificador">Matrícula</label>
+          <input type="text" id="inputIdentificador" placeholder="Ex: 20261234" required>
+        </div>
+        <button type="submit" class="btn-primary">Entrar no Sistema</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- INTERFACE PRINCIPAL -->
+  <div id="appScreen" class="app-container">
+    <navbar>
+      <h2>SIGAA | Módulo Frequência e Horários</h2>
+      <div class="user-info">
+        <span id="displayUserName">Nome Usuário</span>
+        <span id="displayUserRole" class="user-badge">Aluno</span>
+        <button class="btn-logout" onclick="logout()">Sair</button>
+      </div>
+    </navbar>
+
+    <div class="tabs-nav" id="tabsNav"></div>
+
+    <main>
+      <!-- ABA 1: STATUS DOS PROFESSORES (COM PESQUISA) -->
+      <div id="tabPainel" class="tab-content active">
+        <div class="card">
+          <h3 class="card-title">Status em Tempo Real dos Professores</h3>
+          <input type="text" class="search-bar" id="searchProf" onkeyup="filtrarProfessores()" placeholder="🔍 Pesquisar por professor ou disciplina...">
+          
+          <table id="tabelaProfessores">
+            <thead>
+              <tr style="background: #f8fafc;">
+                <th>Professor</th>
+                <th>Disciplina</th>
+                <th>Status Atual</th>
+                <th>Observação</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyProfessores">
+              <!-- Dados inseridos via JS dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ABA 2: GRADE HORÁRIA -->
+      <div id="tabGradeHoraria" class="tab-content">
+        <div class="card">
+          <h3 class="card-title">Horário das Aulas - Turno Manhã</h3>
+          <table class="grid-horario grid-manha">
+            <thead>
+              <tr><th class="horario-col">X</th><th>Segunda</th><th>Terça</th><th>Quarta</th><th>Quinta</th><th>Sexta</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="horario-col">7:00</td><td id="cel-seg-700">Inglês</td><td id="cel-ter-700">Física</td><td id="cel-qua-700">Redação</td><td id="cel-qui-700">Física</td><td id="cel-sex-700">Português</td></tr>
+              <tr><td class="horario-col">7:50</td><td id="cel-seg-750">Biologia</td><td id="cel-ter-750">História</td><td id="cel-qua-750">Redação</td><td id="cel-qui-750">Matemática</td><td id="cel-sex-750">Matemática</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Horário das Aulas - Turno Tarde</h3>
+          <table class="grid-horario grid-tarde">
+            <thead>
+              <tr><th class="horario-col">X</th><th>Segunda</th><th>Terça</th><th>Quarta</th><th>Quinta</th><th>Sexta</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="horario-col">14:00</td><td id="cel-seg-1400">Lab. Programação</td><td id="cel-ter-1400">Prj. Integrador II</td><td id="cel-qua-1400">Banco de Dados</td><td id="cel-qui-1400">Prj. Integrador III</td><td id="cel-sex-1400">Segurança</td></tr>
+              <tr><td class="horario-col">14:50</td><td id="cel-seg-1450">Banco de Dados</td><td id="cel-ter-1450">Segurança</td><td id="cel-qua-1450">Banco de Dados</td><td id="cel-qui-1450">Prj. Integrador III</td><td id="cel-sex-1450">Segurança</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ABA 3: PAINEL EXCLUSIVO DO PROFESSOR -->
+      <div id="tabProfessor" class="tab-content">
+        <div class="card">
+          <h3 class="card-title">1. Atualizar Seu Status de Presença</h3>
+          <form onsubmit="atualizarStatusProfessor(event)">
+            <div class="form-group">
+              <label>Selecione seu Status Atual</label>
+              <select id="selectStatusProf">
+                <option value="Presente no Campus">Presente no Campus</option>
+                <option value="Em Sala de Aula">Em Sala de Aula</option>
+                <option value="Ausente">Ausente</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Observação / Justificativa</label>
+              <input type="text" id="inputObsProf" placeholder="Ex: Em sala Lab 02">
+            </div>
+            <button type="submit" class="btn-primary" style="background: var(--success);">Publicar Status em Tempo Real</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">2. Inserir/Editar Aula na Grade</h3>
+          <form onsubmit="adicionarAulaGrade(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label>Dia</label>
+                <select id="selectDiaGrade">
+                  <option value="seg">Segunda</option>
+                  <option value="ter">Terça</option>
+                  <option value="qua">Quarta</option>
+                  <option value="qui">Quinta</option>
+                  <option value="sex">Sexta</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Horário</label>
+                <select id="selectHoraGrade">
+                  <option value="700">7:00</option>
+                  <option value="750">7:50</option>
+                  <option value="1400">14:00</option>
+                  <option value="1450">14:50</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Disciplina</label>
+                <input type="text" id="inputDisciplinaGrade" placeholder="Ex: Programação" required>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Atualizar Célula da Grade</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // BANCO DE DADOS EM LOCALSTORAGE
+    let professores = JSON.parse(localStorage.getItem('professores_data')) || [
+      { nome: "Prof. Clécio Sousa", disciplina: "Projeto Integrador II", status: "Presente no Campus", obs: "No Lab 02" },
+      { nome: "Prof. Carlos Silva", disciplina: "Estrutura de Dados", status: "Em Sala de Aula", obs: "Sala 04" }
+    ];
+
+    let currentRole = 'aluno';
+    let currentUser = '';
+
+    function salvarDados() {
+      localStorage.setItem('professores_data', JSON.stringify(professores));
+    }
+
+    function setRole(role) {
+      currentRole = role;
+      document.getElementById('btnRoleAluno').classList.toggle('active', role === 'aluno');
+      document.getElementById('btnRoleProfessor').classList.toggle('active', role === 'professor');
+      document.getElementById('labelIdentificador').innerText = role === 'aluno' ? 'Matrícula' : 'Registro SIAPE';
+    }
+
+    function handleAuth(e) {
+      e.preventDefault();
+      currentUser = document.getElementById('inputNome').value;
+      
+      // Se for professor novo, adiciona na lista
+      if (currentRole === 'professor' && !professores.find(p => p.nome === currentUser)) {
+        professores.push({ nome: currentUser, disciplina: "Disciplina Geral", status: "Presente no Campus", obs: "Online" });
+        salvarDados();
+      }
+
+      document.getElementById('authScreen').style.display = 'none';
+      document.getElementById('appScreen').style.display = 'flex';
+      document.getElementById('displayUserName').innerText = currentUser;
+      document.getElementById('displayUserRole').innerText = currentRole;
+
+      setupTabs(currentRole);
+      renderProfessores();
+    }
+
+    function setupTabs(role) {
+      const tabsNav = document.getElementById('tabsNav');
+      if (role === 'aluno') {
+        tabsNav.innerHTML = `
+          <button class="tab-btn active" onclick="switchTab('tabPainel')">Status dos Professores</button>
+          <button class="tab-btn" onclick="switchTab('tabGradeHoraria')">Grade Horária Semanal</button>
+        `;
+      } else {
+        tabsNav.innerHTML = `
+          <button class="tab-btn active" onclick="switchTab('tabPainel')">Visão Geral</button>
+          <button class="tab-btn" onclick="switchTab('tabGradeHoraria')">Grade Horária</button>
+          <button class="tab-btn" onclick="switchTab('tabProfessor')">Painel de Edição</button>
+        `;
+      }
+      switchTab('tabPainel');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      if (event && event.target && event.target.classList.contains('tab-btn')) {
+        event.target.classList.add('active');
+      }
+    }
+
+    // INTERATIVIDADE 1: RENDERIZAR PROFESSORES DINAMICAMENTE
+    function renderProfessores() {
+      const tbody = document.getElementById('tbodyProfessores');
+      tbody.innerHTML = '';
+
+      professores.forEach(p => {
+        let badgeClass = 'status-presente';
+        if (p.status === 'Em Sala de Aula') badgeClass = 'status-aula';
+        if (p.status === 'Ausente') badgeClass = 'status-ausente';
+
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${p.nome}</strong></td>
+            <td>${p.disciplina}</td>
+            <td><span class="status-badge ${badgeClass}">${p.status}</span></td>
+            <td>${p.obs || '-'}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // INTERATIVIDADE 2: FILTRO DE BUSCA
+    function filtrarProfessores() {
+      const termo = document.getElementById('searchProf').value.toLowerCase();
+      const linhas = document.querySelectorAll('#tbodyProfessores tr');
+      
+      linhas.forEach(linha => {
+        const texto = linha.innerText.toLowerCase();
+        linha.style.display = texto.includes(termo) ? '' : 'none';
+      });
+    }
+
+    // INTERATIVIDADE 3: ATUALIZAR STATUS DO PROFESSOR EM TEMPO REAL
+    function atualizarStatusProfessor(e) {
+      e.preventDefault();
+      const novoStatus = document.getElementById('selectStatusProf').value;
+      const novaObs = document.getElementById('inputObsProf').value;
+
+      let prof = professores.find(p => p.nome === currentUser);
+      if (prof) {
+        prof.status = novoStatus;
+        prof.obs = novaObs;
+      } else {
+        professores.push({ nome: currentUser, disciplina: "Geral", status: novoStatus, obs: novaObs });
+      }
+
+      salvarDados();
+      renderProfessores();
+      alert('Status atualizado com sucesso no sistema!');
+      switchTab('tabPainel');
+    }
+
+    // INTERATIVIDADE 4: EDITA CÉLULAS DA GRADE HORÁRIA EM TEMPO REAL
+    function adicionarAulaGrade(e) {
+      e.preventDefault();
+      const dia = document.getElementById('selectDiaGrade').value;
+      const hora = document.getElementById('selectHoraGrade').value;
+      const disciplina = document.getElementById('inputDisciplinaGrade').value;
+
+      const celulaId = `cel-${dia}-${hora}`;
+      const celula = document.getElementById(celulaId);
+      
+      if (celula) {
+        celula.innerText = disciplina;
+        celula.style.fontWeight = 'bold';
+        alert(`Grade atualizada! Célula [${dia.toUpperCase()} ${hora}] agora é ${disciplina}.`);
+        switchTab('tabGradeHoraria');
+      }
+    }
+
+    function logout() {
+      document.getElementById('appScreen').style.display = 'none';
+      document.getElementById('authScreen').style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
