@@ -1,4 +1,4 @@
-# SIGAA + | Módulo de Frequência e Horários em Tempo Real
+# Módulo de Frequência e Horários em Tempo Real
 
 ##  Sobre o Projeto
 O **Horário Acadêmico** é um protótipo funcional desenvolvido para o Colégio Técnico de Bom Jesus (CTBJ). O sistema resolve a dificuldade dos alunos em acessar os horários de atendimento dos professores e verificar sua presença física na instituição.
