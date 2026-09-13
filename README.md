@@ -1,8 +1,23 @@
-# Projeto-Integrador-II-
-Atividade parte 01
+# SIGAA + | Módulo de Frequência e Horários em Tempo Real
 
-1 - Descrição Do Projeto
+## 📌 Sobre o Projeto
+O **SIGAA +** é um protótipo funcional desenvolvido para o Colégio Técnico de Bom Jesus (CTBJ). O sistema resolve a dificuldade dos alunos em acessar os horários de atendimento dos professores e verificar sua presença física na instituição.
 
-1.1 - Os alunos do Colégio Técnico de Bom Jesus têm dificuldade em acessar os horários dos professores para tirar dúvidas ou "subir" aula. Há dificuldade também em saber se o professor está presente na escola ou não.
+---
 
-1.2 - A solução encontrada foi um possível site ou aba no próprio sistema escolar(SIGAA) em que os professores das diversas matérias, tanto do Ensino Médio quanto do Técnico, disponibilizem seus horários para fácil acesso dos alunos, assim como o professor deve "bater o ponto" para os alunos saberem se o professor está em sua sala na Instituição.
+## 🛠️ Tecnologias Utilizadas
+* **HTML5:** Estruturação semântica de interfaces.
+* **CSS3:** Estilização responsiva, variáveis nativas e layout flexível.
+* **JavaScript (Vanilla):** Lógica de manipulação de DOM, alternância de perfis e persistência via `localStorage`.
+
+---
+
+## 📂 Estrutura do Repositório
+```text
+├── src/
+│   └── index.html          # Código-fonte funcional do protótipo
+├── docs/
+│   └── testes.md           # Relatório de testes e validações com usuários
+├── requisitos.md           # Requisitos funcionais e não funcionais
+├── arquitetura.md          # Arquitetura, fluxogramas e modelagem do sistema
+└── README.md               # Documentação principal
